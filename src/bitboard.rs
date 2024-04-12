@@ -1,4 +1,4 @@
-use std::fmt::{Display, Error, Formatter};
+use std::fmt::{Display, Formatter};
 
 #[derive(Copy, Clone)]
 pub struct BitBoard(u64);
@@ -22,10 +22,34 @@ impl BitBoard {
     pub fn set_bit(&mut self, index: u8) {
         self.0 = self.value() | (1 << index)
     }
+    pub fn reset_bit(&mut self, index: u8) {
+        self.0 = self.value() & !(1 << index);
+    }
+    pub fn get_all_set(&self) -> Vec<u8> {
+        let mut result = Vec::new();
+        let mut mask: u64 = 1;
+        for index in 0..64 {
+            if self.0 & mask != 0 {
+                result.push(index as u8);
+            }
+            mask <<= 1;
+        }
+        result
+    }
+    pub fn set_all(&mut self, indices: Vec<u8>) {
+        for i in indices {
+            self.set_bit(i);
+        }
+    }
+    pub fn reset_all(&mut self, indices: Vec<u8>) {
+        for i in indices {
+            self.reset_bit(i);
+        }
+    }
 }
 
 impl Display for BitBoard {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut output: String = "".to_owned();
         for rank in (0..8).rev() {
             for file in 0..8 {
